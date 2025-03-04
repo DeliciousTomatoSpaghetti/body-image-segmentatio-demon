@@ -5,40 +5,29 @@ import ToDataURLWorker from "./toDataURL.worker.js";
 
 const toDataURLWorker = new ToDataURLWorker()
 
-const container = document.querySelector('.container');
 const mask = document.querySelector('.mask');
 mask.style.backgroundImage = `url(../public/football-player.png)`;
 const videoElement = document.getElementById('video');
-const canvasElement = document.getElementById('canvas');
-const canvasContext = canvasElement.getContext('2d');
+
 const WIDTH = 400
 const HEIGHT = 600
 
 // 创建离屏canvas处理视频帧
 // const offscreenCanvas = document.createElement('canvas');
 const offscreenCanvas = new OffscreenCanvas(WIDTH, HEIGHT);
-canvasElement.style.willChange = 'contents';
-canvasElement.style.transform = 'translateZ(0)';
-const offscreenContext = offscreenCanvas.getContext('2d', { willReadFrequently: true });
 
+const offscreenContext = offscreenCanvas.getContext('2d');
+
+let lastTime = 0;
+const targetFPS = 15;
+let intervalTime = 1000 / targetFPS; // 每帧的时间间隔（毫秒）
 
 // 处理视频分割
 async function processVideoSegmentation() {
-  console.log(canvasElement, videoElement);
-  // 设置画布尺寸与视频一致
-  console.log(videoElement.videoWidth, videoElement.videoHeight);
-
-  canvasElement.width = WIDTH
-  canvasElement.height = HEIGHT
-  offscreenCanvas.width = WIDTH
-  offscreenCanvas.height = HEIGHT
 
   // 加载BodyPix模型
   const segmentationModel = await bodyPix.load();
 
-  let lastTime = 0;
-  const targetFPS = 15;
-  const intervalTime = 1000 / targetFPS; // 每帧的时间间隔（毫秒）
 
   // 帧处理函数
   async function processFrame() {
@@ -77,7 +66,15 @@ async function processVideoSegmentation() {
       }, [frameData.data.buffer, segmentationResult.data.buffer])
       toDataURLWorker.onmessage = function (e) {
         const base64 = e.data
-        mask.style.webkitMaskBoxImage = `url(${base64})`;
+        if (!base64) {
+          // debugger
+          intervalTime = 2000
+          mask.style.webkitMaskBoxImage = 'none';
+          return
+        }else {
+          intervalTime = 1000 / targetFPS; // 每帧的时间间隔（毫秒）
+          mask.style.webkitMaskBoxImage = `url(${base64})`;
+        }
       }
 
       requestAnimationFrame(processFrame);
