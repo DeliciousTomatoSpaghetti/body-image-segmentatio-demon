@@ -49,6 +49,13 @@ export default {
                 test: /\.(png|svg|jpg|jpeg|gif)$/i,
                 type: 'asset/resource', // 处理图片文件
             },
+            {
+                // 匹配以 .worker.js 结尾的文件
+                test: /\.worker\.js$/,
+                use: {
+                    loader: 'worker-loader',
+                }
+            }
         ],
     },
     mode: 'development', // 开发模式
