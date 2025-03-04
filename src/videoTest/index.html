@@ -5,14 +5,42 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Document</title>
+  <style>
+    .container {
+      position: relative;
+      height: 600px;
+      width: 400px;
+    }
+    #video {
+      width: 100%;
+      height: 100%;
+    }
+    .container .mask {
+      width: 100%;
+      height: 100%;
+      position: absolute;
+      z-index: 1000;
+      left: 0;
+      top: 0;
+      pointer-events: none;
+      /* background-color: aqua; */
+    }
+    #canvas {
+      position: absolute;
+      right: 0;
+      top: 0;
+    
+    }
+  </style>
 </head>
 
 <body>
-  <div style="display: flex;">
-    <video id="video" width="400" height="300" muted autoplay playsinline></video>
-    <canvas id="canvas" width="400" height="300"></canvas>
+  <div class="container" >
+    <video id="video" loop="true" muted autoplay controls src="../public/dance.mp4"></video>
+    <div class="mask">
+    </div>
   </div>
-  
+  <canvas width="400" height="600" id="canvas"></canvas>
 </body>
 
 </html>
